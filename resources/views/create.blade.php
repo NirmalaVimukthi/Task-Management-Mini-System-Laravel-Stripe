@@ -74,7 +74,7 @@
                     <th>Action</th>
                     </tr>
                 </thead> 
-                <tbody >
+                <tbody  id="userset">
                   
 
                 </tbody>   
@@ -178,7 +178,7 @@
                         $('#newTaskForm')[0].reset(); // Reset the form fields
                         $('.select2').val(null).trigger('change'); // Reset the Select2 dropdown
 
-                        $('#user_list tbody').html();
+                        $('#userset').html('');
 
 
                     },
