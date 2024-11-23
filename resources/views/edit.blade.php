@@ -135,16 +135,17 @@
     </div>
 <br>
 
-</div>
+
 </form>
 
 
-    <div class="row">
-    <h3>Task Status</h3>
-        </div>
- <div class="row">
+  
+
     <div class="col-md-8 padding-2" >
         <div class="card bg-white" style="min-height:50px">
+        <div class="card-header" >
+            <h5>Task Status</h5>
+            </div>
             <div class="card-body"  id="task_status">
                 <h4>processing Task </h4> 
                 <button type="button" class="btn btn-primary">Complete </button>
@@ -435,6 +436,18 @@ $('.update-btn').hide();
         // Remove the parent <tr> (table row) of the clicked "Remove" button
         $(this).closest('tr').remove();
     });
+
+    window.addEventListener('load', function() {
+      const container = document.querySelector('.padding-2');
+      const items = Array.from(container.children);
+
+      // Sort items by height
+      items.sort((a, b) => a.clientHeight - b.clientHeight);
+
+      // Append sorted items back to the container
+      items.forEach(item => container.appendChild(item));
+    });
+
 </script>
 
 

@@ -121,6 +121,7 @@ html, body {
 
        .padding-2{
             padding: 2px;
+            height: fit-content;
         }
 
             /* class for windesign  */
