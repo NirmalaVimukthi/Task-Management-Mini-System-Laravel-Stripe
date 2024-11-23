@@ -83,8 +83,8 @@
         // create a datatable
         var table = $('#tasksTable').DataTable({
          
-            processing: true,  // Show a processing indicator
-            serverSide: true, 
+            processing: true,
+            serverSide: true,
             ajax: {
                 url: '/api/v1/tasks',  // Your endpoint
                 method: 'GET', 
@@ -104,8 +104,13 @@
         order: [[2, 'asc']],
         dom: 'Bfrtip',  // Define the position of buttons
         buttons: [
-            'csv', // Export to CSV
-        ]
+            'csv','pdf' // Export to CSV
+        ],
+        layout: {
+        topStart: {
+            buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+        }
+    }
               
         });
  

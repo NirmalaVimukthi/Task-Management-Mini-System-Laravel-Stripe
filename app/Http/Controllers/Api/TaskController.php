@@ -40,6 +40,8 @@ class TaskController extends Controller
         ])
 
 
+
+
         ->addColumn('users', function ($task) {
                 $users="";
                 foreach($task->users as $user){
@@ -58,6 +60,38 @@ class TaskController extends Controller
             'creator',
         ])
     
+
+
+        ->addColumn('is_completed', function ($task) {
+         
+            if($task->is_completed == 1){
+                return "Yes";
+            }
+            else{
+                 return "No";
+            }
+                 
+            })
+            ->rawColumns(
+            [
+                'is_completed',
+            ])
+
+
+            ->addColumn('is_paid', function ($task) {
+         
+                if($task->is_paid == 1){
+                    return "Yes";
+                }
+                else{
+                     return "No";
+                }
+                     
+                })
+                ->rawColumns(
+                [
+                    'is_paid',
+                ])
     
         ->addColumn('action', function ($tasks) {
             $actions= '<span style="display:flex">'.
