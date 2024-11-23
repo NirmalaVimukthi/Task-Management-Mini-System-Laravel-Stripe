@@ -341,64 +341,71 @@
 
 
        const stripe = Stripe('{{ config('services.stripe.key') }}');
-    const elements = stripe.elements();
-    const cardElement = elements.create('card');
-    cardElement.mount('#card-element');
-   var  PayTaskId =  $('#payment_task_id').val();
-   console.log('url to pay : /api/v1/tasks/'+PayTaskId+'/pay');
+const elements = stripe.elements();
+const cardElement = elements.create('card');
+cardElement.mount('#card-element');
 
-    const form = $('#payment-form');
-    const submitButton = $('#submit-button');
+const form = $('#payment-form');
+const submitButton = $('#submit-button');
 
-    form.on('submit', async function (e) {
-        $('#submit-button').html(' <i class="fa-solid fa-circle-notch fa-spin"></i>');
-        e.preventDefault();
-        PayTaskId =  $('#payment_task_id').val();
-      
-        submitButton.prop('disabled', true); // Disable the button
+// Handle form submission
+form.on('submit', async function (e) {
+    e.preventDefault();
+    
+    const PayTaskId = $('#payment_task_id').val();
+    const userId = $('#payment_user_id').val();
 
-        // Create a Payment Method
-        const { paymentMethod, error } = await stripe.createPaymentMethod({
-            type: 'card',
-            card: cardElement,
-        });
+    // Change the button text to show a loading state
+    submitButton.html('<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...');
+    submitButton.prop('disabled', true); // Disable the button
 
-        if (error) {
-            console.error(error);
-            submitButton.prop('disabled', false); // Re-enable the button if there's an error
-        } else {
-            // If payment method creation is successful
-            $('#payment-method').val(paymentMethod.id);
-
-            // Use jQuery AJAX to submit the form
-           
-            $.ajax({
-                url: '/api/v1/tasks/'+PayTaskId+'/pay', // Use the form's action attribute as the URL
-                method: 'POST',
-                data: form.serialize(), // Serialize the form data
-                success: function (response) {
-                    // Handle the success response here
-                    console.log('Payment successful:', response);
-                    if(response.success ==true){
-                        completepayment();
-                    }
-                    else{
-                        $('#payment-msg').html('<p style="color: red;">'+response.error+' </p>');  
-                    }
-                    submitButton.prop('disabled', false); // Re-enable the button if needed
-
-                    $('#submit-button').html('Pay $10.00');
-                },
-                error: function (xhr, status, error) {
-                    // Handle any errors here
-                    console.error('Payment error:', error);
-                    $('#payment-msg').html('<p style="color: red;">'+error+' </p>');
-                    submitButton.prop('disabled', false); // Re-enable the button if needed
-                    $('#submit-button').html('Pay $10.00');
-                }
-            });
-        }
+    // Create a Payment Method using Stripe
+    const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
     });
+
+    if (error) {
+        console.error('Payment method error:', error);
+        $('#payment-msg').html(`<p style="color: red;">${error.message}</p>`);
+        submitButton.prop('disabled', false); // Re-enable the button
+        submitButton.html('Pay $10.00');
+    } else {
+        // If payment method creation is successful
+        $('#payment-method').val(paymentMethod.id);
+
+        // Use jQuery AJAX to submit the payment
+        $.ajax({
+            url: `/api/v1/tasks/${PayTaskId}/pay`, // Adjust your URL structure
+            method: 'POST',
+            data: form.serialize(), // Serialize the form data
+            success: function (response) {
+                // Handle the success response
+                console.log('Payment successful:', response);
+
+                if (response.success === true) {
+                    $('#payment-msg').html('<p style="color: green;">Payment successful!</p>');
+                    completepayment(); // Call your completion function if needed
+                } else {
+                    $('#payment-msg').html(`<p style="color: red;">${response.error}</p>`);
+                }
+                
+                submitButton.prop('disabled', false);
+                submitButton.html('Pay $10.00');
+            },
+            error: function (xhr, status, error) {
+                // Handle any errors
+                console.error('Payment error:', error);
+                $('#payment-msg').html('<p style="color: red;">An error occurred during payment.</p>');
+                
+                submitButton.prop('disabled', false);
+                submitButton.html('Pay $10.00');
+            }
+        });
+    }
+});
+
+   
 
 
 

@@ -245,9 +245,11 @@ class TaskController extends Controller
     
         $user_id = $request->user_id;
         $user = User::find($user_id);
-           
+
+        $user->createOrGetStripeCustomer();
+        $customerId = $user->stripe_id;
           
-            $user->createOrGetStripeCustomer();
+       
             $user->updateDefaultPaymentMethod($paymentMethod);
    
 
@@ -255,20 +257,29 @@ class TaskController extends Controller
 
             // Set your Stripe API key
             Stripe::setApiKey(config('services.stripe.secret'));
+
+
     
             try {
-                // Create a PaymentIntent with automatic payment methods enabled and no redirects
+         
                 $paymentIntent = PaymentIntent::create([
-                    'amount' => 1000, // Amount in cents (e.g., $10.00)
+                    'amount' => 1000, // $10.00 USD (in cents)
                     'currency' => 'usd',
-                    'payment_method' => $paymentMethod,
+                    'payment_method' => $paymentMethod, // Make sure this is a valid payment method ID
+                    'customer' => $customerId, // Make sure this is a valid customer ID
                     'confirmation_method' => 'manual',
-                    'confirm' => true,
-                    'automatic_payment_methods' => [
-                        'enabled' => true,
-                        'allow_redirects' => 'never', // Disabling redirects
-                    ],
+                    'confirm' => true,// Set the return URL here
+                    'return_url' => route('payment.callback'),
                 ]);
+        
+                // Check if the payment requires additional action
+                if ($paymentIntent->status === 'requires_action' || $paymentIntent->status === 'requires_source_action') {
+                    return response()->json([
+                        'requires_action' => true,
+                        'payment_intent_client_secret' => $paymentIntent->client_secret,
+                        'redirect_url' => $paymentIntent->next_action->redirect_to_url->url
+                    ]);
+                }
 
 
                
@@ -293,6 +304,12 @@ class TaskController extends Controller
 
 
 
+    public function handleCallback(Request $request)
+    {
+        // You can retrieve payment intent ID if needed
+        $paymentIntentId = $request->input('payment_intent');
+        return response()->json(['message' => 'payment successfully','success'=>true]);
+    }
 
 
 }

@@ -11,7 +11,7 @@
 ## Features
 - **Task Management:** Full CRUD operations to manage tasks via API.
 - **Email Notifications:** Sends notifications for task updates and important actions.
-- **Payment Gateway:** Integration with a payment gateway (some issues remaining).
+- **Payment Gateway:** Integration with a payment gateway.
 
 ## Installation
 

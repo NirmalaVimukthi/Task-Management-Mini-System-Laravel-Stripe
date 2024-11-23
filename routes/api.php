@@ -23,6 +23,8 @@ Route::prefix('v1')->group(function () {
     Route::put('/tasks/{id}/complete', [TaskController::class, 'complete']); // PUT update a task
     Route::post('/tasks/{id}/pay', [TaskController::class, 'pay']); // Payment for a task
 
+    Route::get('/payment/callback', [TaskController::class, 'handleCallback'])->name('payment.callback');
+
 });
 
 
