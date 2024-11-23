@@ -155,6 +155,9 @@
 
     <div class="col-md-4 padding-2" >
         <div class="card bg-white" style="min-height:50px">
+        <div class="card-header">
+        <label for="create_user">Task Payment</label>
+        </div>
             <div class="card-body"  id="task_payment_card">
 
         <div id="payment-msg">

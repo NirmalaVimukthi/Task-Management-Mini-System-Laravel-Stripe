@@ -16,6 +16,7 @@ use Exception;
 
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
+use Yajra\DataTables\Facades\DataTables;
 
 class TaskController extends Controller
 {
@@ -25,7 +26,55 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = Task::with(['users', 'creator'])->get();
-        return response()->json($tasks);
+   
+        return DataTables::of($tasks)
+        ->addColumn('creator', function ($task) {
+                
+
+ 
+            return $task->creator ? $task->creator->name : 'No Creator';
+        })
+        ->rawColumns(
+        [
+            'creator',
+        ])
+
+
+        ->addColumn('users', function ($task) {
+                $users="";
+                foreach($task->users as $user){
+                    if($users !== ""){
+                    $users =$users.", ".$user->name;
+                    }
+                    else{
+                        $users =$user->name;
+                    }
+                }
+ 
+            return $task->users ? $users : 'No users';
+        })
+        ->rawColumns(
+        [
+            'creator',
+        ])
+    
+    
+        ->addColumn('action', function ($tasks) {
+            $actions= '<span style="display:flex">'.
+           ' <a href="tasks/.$tasks->id ."> <button class="btn btn-primary list-edit btn-sm view-btn" data-id="'.$tasks->id.'" >View/Edit</button></a>'.
+            ' <button class="btn btn-danger btn-sm delete-btn"  onclick="confirmDelete('.$tasks->id.')" data-id="'.$tasks->id.'">Delete</button>'.
+            '</span>';
+ 
+
+ 
+            return  $actions;
+        })
+        ->rawColumns(
+        [
+            'action',
+        ])
+        ->make(true);
+       // return response()->json($tasks);
     }
 
     /**

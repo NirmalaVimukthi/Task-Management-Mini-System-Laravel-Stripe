@@ -4,11 +4,25 @@
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
+<!-- Include DataTables Buttons CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
 <!-- jQuery (required for DataTables) -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <!-- DataTable JS -->
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+
+<!-- JSZip for CSV export -->
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+<!-- PDFMake for PDF export (optional) -->
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+
+<!-- DataTables Buttons for PDF, Excel, CSV (optional) -->
+<script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 
 
 <div class="row">
@@ -57,35 +71,24 @@
 </form>
 
    <script>
+
     $(document).ready(function() {
-        // Initialize DataTable
+
+
+ 
+
+
+
+        // create a datatable
         var table = $('#tasksTable').DataTable({
+         
             processing: true,  // Show a processing indicator
-            serverSide: true,  // Enable server-side processing
+            serverSide: true, 
             ajax: {
                 url: '/api/v1/tasks',  // Your endpoint
-                method: 'GET',  // HTTP method
-                dataSrc: function (json) {
-                    // Process the data before sending it to DataTable
-                    return json.map(function (task) {
-                        return {
-                            id: task.id,
-                            title: task.title,
-                            due_date: task.due_date,
-                        priority: task.priority,
-                        creator: task.creator.name,
-                        users: task.users.map(user => user.name).join(", "),
-                        is_completed: task.is_completed ? 'Yes' : 'No',  // Convert boolean to Yes/No
-                        is_paid: task.is_paid ? 'Yes' : 'No',            // Convert boolean to Yes/No
-                        action: `<span style="display:flex">
-                           <a href="tasks/`+task.id+`"> <button class="btn btn-primary list-edit btn-sm view-btn" data-id="${task.id}" >View/Edit</button></a>
-                            <button class="btn btn-danger btn-sm delete-btn"  onclick="confirmDelete(${task.id})" data-id="${task.id}">Delete</button>
-                        </span>`,
-                
-                        };
-                    });
-                }
-            },
+                method: 'GET', 
+            }, 
+            
             columns: [
             { data: 'id' },
             { data: 'title' },
@@ -97,10 +100,14 @@
             { data: 'is_paid' },
             { data: 'action' },
         ],
-        order: [[2, 'asc']] 
+        order: [[2, 'asc']],
+        dom: 'Bfrtip',  // Define the position of buttons
+        buttons: [
+            'csv', // Export to CSV
+        ]
+              
         });
-
-    });
+ 
 
     
     $('#tasksTable').on('click', '.list-edit', function(event) {
@@ -123,6 +130,8 @@
 
               
 
+
+});
 
 });
 
