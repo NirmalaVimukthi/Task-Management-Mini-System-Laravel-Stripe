@@ -351,6 +351,7 @@
     const submitButton = $('#submit-button');
 
     form.on('submit', async function (e) {
+        $('#submit-button').html(' <i class="fa-solid fa-circle-notch fa-spin"></i>');
         e.preventDefault();
         PayTaskId =  $('#payment_task_id').val();
       
@@ -385,12 +386,15 @@
                         $('#payment-msg').html('<p style="color: red;">'+response.error+' </p>');  
                     }
                     submitButton.prop('disabled', false); // Re-enable the button if needed
+
+                    $('#submit-button').html('Pay $10.00');
                 },
                 error: function (xhr, status, error) {
                     // Handle any errors here
                     console.error('Payment error:', error);
                     $('#payment-msg').html('<p style="color: red;">'+error+' </p>');
                     submitButton.prop('disabled', false); // Re-enable the button if needed
+                    $('#submit-button').html('Pay $10.00');
                 }
             });
         }
