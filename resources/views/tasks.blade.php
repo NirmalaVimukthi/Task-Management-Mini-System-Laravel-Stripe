@@ -77,7 +77,7 @@
                         users: task.users.map(user => user.name).join(", "),
                         is_completed: task.is_completed ? 'Yes' : 'No',  // Convert boolean to Yes/No
                         is_paid: task.is_paid ? 'Yes' : 'No',            // Convert boolean to Yes/No
-                        action: `<span>
+                        action: `<span style="display:flex">
                            <a href="tasks/`+task.id+`"> <button class="btn btn-primary list-edit btn-sm view-btn" data-id="${task.id}" >View/Edit</button></a>
                             <button class="btn btn-danger btn-sm delete-btn"  onclick="confirmDelete(${task.id})" data-id="${task.id}">Delete</button>
                         </span>`,

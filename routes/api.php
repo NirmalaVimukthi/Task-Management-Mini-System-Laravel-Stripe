@@ -18,12 +18,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/tasks/{id}', [TaskController::class, 'show']); // GET a specific task
     Route::put('/tasks/{id}', [TaskController::class, 'update']); // PUT update a task
   
-    
     Route::delete('/tasks/{id}', [TaskController::class, 'destroy']); // DELETE a task
 
-    // Additional routes to manage task-user relationships
-    Route::post('/tasks/{id}/assign-users', [TaskController::class, 'assignUsers']); // Assign users to a task
-    Route::get('/tasks/{id}/users', [TaskController::class, 'getUsers']); // Get users assigned to a task
+    Route::put('/tasks/{id}/complete', [TaskController::class, 'complete']); // PUT update a task
+    Route::post('/tasks/{id}/pay', [TaskController::class, 'pay']); // Payment for a task
+
 });
 
 

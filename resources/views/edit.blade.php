@@ -1,6 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+
+#payment-form {
+            background-color: #e0f7fa; /* Light cyan */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        #card-element {
+            background-color: #ffffff; /* White background for the card element */
+            padding: 10px;
+            border: 1px solid #b3e5fc; /* Light blue border */
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        #submit-button {
+            background-color: #03a9f4; /* Light blue button */
+            color: white;
+            font-size: 16px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        #submit-button:hover {
+            background-color: #0288d1; /* Darker blue on hover */
+        }
+
+        .form-heading {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #0277bd; /* Darker shade of blue */
+            font-size: 1.2rem;
+        }
+    </style>
+
 <div class="row">
     <h2>Edit Task</h2>
 </div>
@@ -40,15 +83,12 @@
                             <option value="Low">Low</option>
                         </select>
                     </div>
-                    <div class="form-group form-check">
-                        <input type="checkbox" class="form-check-input" id="is_completed" name="is_completed">
-                        <label class="form-check-label" for="is_completed">Completed</label>
-                    </div>
+                
           
                     <input type="hidden" class="form-control" id="user_id" name="user_id" value="{{ auth()->user()->id }}"  >
                     <hr>
 
-                    <button type="submit" class="btn btn-primary">Update Task</button>
+                    <button type="submit" class="btn btn-primary update-btn">Update Task</button>
          
 
                 </div>
@@ -65,7 +105,7 @@
         <label for="create_user">Select Users For Task</label>
         </div>
             <div class="card-body">
-            <div class="form-group">
+            <div class="form-group" id="user_select">
              
                 <select style="width:100%"  class="form-control select2" >
                     <!-- Options will be dynamically loaded via AJAX -->
@@ -79,7 +119,7 @@
                 <thead>
                     <tr>
                     <th style="width:70%">User</th>
-                    <th>Action</th>
+                    <th id="actions">Action</th>
                     </tr>
                 </thead> 
                 <tbody >
@@ -93,10 +133,59 @@
             </div>
         </div>    
     </div>
- 
-</div>
+<br>
 
+</div>
 </form>
+
+
+    <div class="row">
+    <h3>Task Status</h3>
+        </div>
+ <div class="row">
+    <div class="col-md-8 padding-2" >
+        <div class="card bg-white" style="min-height:50px">
+            <div class="card-body"  id="task_status">
+                <h4>processing Task </h4> 
+                <button type="button" class="btn btn-primary">Complete </button>
+
+            </div>    
+        </div>
+    </div>
+
+    <div class="col-md-4 padding-2" >
+        <div class="card bg-white" style="min-height:50px">
+            <div class="card-body"  id="task_payment_card">
+
+        <div id="payment-msg">
+        <p style="color: green;"></p>
+
+
+
+        <p style="color: red;"></p>
+        </div>
+
+
+    <form id="payment-form" action="" method="POST">
+        @csrf
+        <div id="card-element"></div>
+        <input type="hidden" class="form-control" id="payment_task_id" name="payment_task_id" value=""  >
+        <input type="hidden" name="paymentMethod" id="payment-method">
+        <input type="hidden" class="form-control" id="payment_user_id" name="user_id" value="{{ auth()->user()->id }}"  >
+
+        <button type="submit" id="submit-button">Pay $10.00</button>
+    </form>
+
+    
+
+</div>    
+        </div>
+    </div>
+
+
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
 
 <script>
     $(document).ready(function() {
@@ -130,7 +219,7 @@
         console.log('Selected Text: ' + selectedData.text);
 
 
-       $('#user_list tbody').append('<tr> <td> '+selectedData.text+' <input type="hidden" name="users[]" value="'+selectedData.id+'"></td><td><button type="button" class="btn btn-secondary remove-row btn-sm">Remove </button> </td> </tr>');
+       $('#user_list tbody').append('<tr> <td> '+selectedData.text+' <input type="hidden" name="users[]" value="'+selectedData.id+'"></td><td class="actions"><button type="button" class="btn btn-secondary remove-row btn-sm">Remove </button> </td> </tr>');
 
   
     });
@@ -148,19 +237,42 @@
                 console.log(response);
                 // Populate the form fields with the fetched data
                 $('#task_id').val(response.id);
+                $('#payment_task_id').val(response.id);
                 $('#title').val(response.title);
                 $('#description').val(response.description);
                 $('#due_date').val(response.due_date);
                 $('#priority').val(response.priority);
-                $('#is_completed').prop('checked', response.is_completed);
-                $('#is_paid').prop('checked', response.is_paid);
+              //  $('#is_completed').prop('checked', response.is_completed);
+               // $('#is_paid').prop('checked', response.is_paid);
 
-
-
-                $.each(response.users, function(index, user) {
+               $.each(response.users, function(index, user) {
                     $('#user_list tbody').append('<tr> <td> '+user.name+' <input type="hidden" name="users[]" value="'+user.id+'"></td><td><button type="button" class="btn btn-secondary remove-row btn-sm">Remove </button> </td> </tr>');
 
                     });
+                if(response.is_completed == true){
+
+                    completeprocess();
+
+
+
+                }
+                else{
+
+                    
+                    $('#task_status').html('<h4>Task is Processing...  </h4> '+
+                '<button type="button" class="btn btn-primary" onclick="confirmstatus('+response.id+')">Complete </button>');
+                }
+
+
+
+                if(response.is_paid == true){
+
+                    completepayment();
+
+
+
+                            }
+              
               //  $('#user_list tbody').append('<tr> <td> '+selectedData.text+' <input type="hidden" name="users[]" value="'+selectedData.id+'"></td><td><button type="button" class="btn btn-secondary remove-row btn-sm">Remove </button> </td> </tr>');
 
 
@@ -198,20 +310,7 @@
                 };
 
 
-            // Send the data to the server to update the task
-            // $.ajax({
-            //     url: '/api/v1/tasks/' + formData.task_id,  // Update task API endpoint
-            //     type: 'post',
-            //     data: JSON.stringify(formData),
-            //     contentType: 'application/json',
-            //     success: function(response) {
-            //        // alert('Task updated successfully!');
-            //        // window.location.href = '/tasks';  // Redirect to the tasks list after updating
-            //     },
-            //     error: function(xhr, status, error) {
-            //         console.error("Error updating task:", error);
-            //     }
-            // });
+       
 
 
             $.ajax({
@@ -236,6 +335,93 @@
             });
 
        // });
+
+
+       const stripe = Stripe('{{ config('services.stripe.key') }}');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+   var  PayTaskId =  $('#payment_task_id').val();
+   console.log('url to pay : /api/v1/tasks/'+PayTaskId+'/pay');
+
+    const form = $('#payment-form');
+    const submitButton = $('#submit-button');
+
+    form.on('submit', async function (e) {
+        e.preventDefault();
+        PayTaskId =  $('#payment_task_id').val();
+      
+        submitButton.prop('disabled', true); // Disable the button
+
+        // Create a Payment Method
+        const { paymentMethod, error } = await stripe.createPaymentMethod({
+            type: 'card',
+            card: cardElement,
+        });
+
+        if (error) {
+            console.error(error);
+            submitButton.prop('disabled', false); // Re-enable the button if there's an error
+        } else {
+            // If payment method creation is successful
+            $('#payment-method').val(paymentMethod.id);
+
+            // Use jQuery AJAX to submit the form
+           
+            $.ajax({
+                url: '/api/v1/tasks/'+PayTaskId+'/pay', // Use the form's action attribute as the URL
+                method: 'POST',
+                data: form.serialize(), // Serialize the form data
+                success: function (response) {
+                    // Handle the success response here
+                    console.log('Payment successful:', response);
+                    if(response.success ==true){
+                        completepayment();
+                    }
+                    else{
+                        $('#payment-msg').html('<p style="color: red;">'+response.error+' </p>');  
+                    }
+                    submitButton.prop('disabled', false); // Re-enable the button if needed
+                },
+                error: function (xhr, status, error) {
+                    // Handle any errors here
+                    console.error('Payment error:', error);
+                    $('#payment-msg').html('<p style="color: red;">'+error+' </p>');
+                    submitButton.prop('disabled', false); // Re-enable the button if needed
+                }
+            });
+        }
     });
+
+
+
+    });
+
+
+
+
+    function completeprocess(){
+        $('#task_status').html('<img src="/icons/done.png" style="    width: 39px;"><h4>Task is Complete.  </h4> ');
+
+$('#actions').hide();
+$('.remove-row').hide();
+
+$('#user_list').closest('button').hide();
+$('#user_select').hide();
+$('.update-btn').hide();
+    }
+
+    function completepayment(){
+        $('#task_payment_card').html('<img src="/icons/done.png" style="    width: 39px;"><h4>Task Payment is Complete.  </h4> ');
+    }
 </script>
+
+
+
+    <script>
+        
+    </script>
+
+
+@include('modals.taskstatus')
 @endsection
