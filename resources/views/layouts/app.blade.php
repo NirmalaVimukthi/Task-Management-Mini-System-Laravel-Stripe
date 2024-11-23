@@ -7,7 +7,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Task Manegment System') }}</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
@@ -67,6 +67,8 @@ html, body {
          
             transition: transform 0.3s ease;
             padding: var(--slidebar-padding);
+            overflow-x: hidden;
+            background-image: linear-gradient(to top, #dce6f1 0%, rgb(233 238 244) 100%);
     
         }
 
@@ -184,11 +186,18 @@ html, body {
                 color: #495057;
             }
 
+
+            .nav-item a{
+
+                min-width: -webkit-fill-available;
+            }
+
         /* Show sidebar on larger screens */
         @media (min-width: 768px) {
             .sidebar {
                 width: var(--sidebar-width);
                 transform: none;
+                background-image: unset;
              
             }
 
@@ -264,7 +273,7 @@ html, body {
                 </div>
             </div>
         </nav>
-
+        @auth
 
         <!-- Single Sidebar -->
         <div class="sidebar sidebar-hidden" id="sidebar">
@@ -292,11 +301,14 @@ html, body {
                     </li>
                     <li class="nav-item">
                     <img src="/icons/power-off.png">
-                        <a class="nav-link" href="#">Logout</a>
+                        <a class="nav-link"  href="{{ route('logout') }}"
+                                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">Logout</a>
                     </li>
                 </ul>
             </div>
         </div>
+
+        @endauth
 
         <!-- Main Content Area -->
         <main class="main-content py-4 ">
