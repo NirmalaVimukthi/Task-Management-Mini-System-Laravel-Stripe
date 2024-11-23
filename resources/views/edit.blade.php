@@ -428,6 +428,13 @@ $('.update-btn').hide();
     function completepayment(){
         $('#task_payment_card').html('<img src="/icons/done.png" style="    width: 39px;"><h4>Task Payment is Complete.  </h4> ');
     }
+
+
+    
+    $('#user_list').on('click', '.remove-row', function() {
+        // Remove the parent <tr> (table row) of the clicked "Remove" button
+        $(this).closest('tr').remove();
+    });
 </script>
 
 
