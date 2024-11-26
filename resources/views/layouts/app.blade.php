@@ -31,6 +31,9 @@
 :root {
     --sidebar-width: 300px;
     --slidebar-padding:10px;
+
+    --sidebar-width-mode-modern: 66px;
+    --slidebar-padding-mode-modern:10px;
 }
 
 
@@ -201,6 +204,30 @@ html, body {
              
             }
 
+          .modern .sidebar {
+                width: var(--sidebar-width-mode-modern);
+                transform: none;
+                background-image: unset;
+             
+            }
+
+            .modern .main-content {
+                margin-left: var(--sidebar-width-mode-modern );
+            }
+
+            .modern .navbar .container{
+                margin-left:var(--sidebar-width-mode-modern);
+                margin-right: 65px;
+              
+            }
+
+            .sidebar {
+                width: var(--sidebar-width);
+                transform: none;
+                background-image: unset;
+             
+            }
+
             /* Adjust the main content margin to make room for the sidebar */
             .main-content {
                 margin-left: var(--sidebar-width);
@@ -222,7 +249,7 @@ html, body {
     <nav class="navbar navbar-expand-md navbar-light bg-transparent">
             <div class="container">
                 <!-- Sidebar Toggle Button for Mobile -->
-                <button class="btn btn-primary d-md-none" id="sidebarToggle">
+                <button class="btn btn-primary " id="sidebarToggle">
                     ☰ Menu
                 </button>
                 <a class="navbar-brand ms-2" href="{{ url('/') }}">
@@ -328,7 +355,7 @@ html, body {
             const toggleButton = document.getElementById('sidebarToggle');
 
             toggleButton.addEventListener('click', function () {
-                sidebar.classList.toggle('sidebar-hidden');
+                body.classList.toggle('modern');
             });
         });
     </script>
